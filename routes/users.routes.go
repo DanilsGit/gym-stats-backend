@@ -8,6 +8,7 @@ import (
 	"github.com/danilsgit/gym-stats-backend/models"
 )
 
+// Usuario
 func GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("GET /users"))
 }
@@ -35,6 +36,13 @@ func PostUserHandler(w http.ResponseWriter, r *http.Request) {
 	result := db.DB.Where("email = ?", user.Email).First(&existingUser)
 	if result.Error == nil {
 		http.Error(w, "El correo ya está en uso", http.StatusBadRequest)
+		return
+	}
+
+	// Comprobar si el username ya existe en la BD
+	result = db.DB.Where("username = ?", user.Username).First(&existingUser)
+	if result.Error == nil {
+		http.Error(w, "El nombre de usuario ya está en uso", http.StatusBadRequest)
 		return
 	}
 

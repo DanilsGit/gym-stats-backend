@@ -1,10 +1,13 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/danilsgit/gym-stats-backend/db"
@@ -41,6 +44,37 @@ func GenerateJWT(userID string) (string, error) {
 	return tokenString, nil
 }
 
+func JwtAuthentication(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authorizationHeader := r.Header.Get("Authorization")
+		if authorizationHeader == "" {
+			http.Error(w, "Acceso denegado. No se encontró el token de autorización", http.StatusForbidden)
+			return
+		}
+
+		tokenString := strings.Split(authorizationHeader, " ")[1]
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("Error inesperado al validar el token")
+			}
+			return jwtKey, nil
+		})
+
+		if err != nil {
+			http.Error(w, "Token de autorización inválido", http.StatusForbidden)
+			return
+		}
+
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			ctx := context.WithValue(r.Context(), "userID", claims["user_id"])
+			next.ServeHTTP(w, r.WithContext(ctx))
+		} else {
+			http.Error(w, "Token de autorización inválido", http.StatusForbidden)
+			return
+		}
+	})
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var credentials models.User
 	err := json.NewDecoder(r.Body).Decode(&credentials)
@@ -60,6 +94,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	result := db.DB.Where("email = ?", credentials.Email).First(&userExist)
 	if result.Error != nil {
 		http.Error(w, "Usuario sin cuenta", http.StatusNotFound)
+		return
+	} else if userExist.Password == "" {
+		http.Error(w, "Utiliza el inicio de sesión social", http.StatusBadRequest)
 		return
 	}
 

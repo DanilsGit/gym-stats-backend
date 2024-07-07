@@ -1,11 +1,19 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 // Routine representa una rutina en la base de datos
 type Routine struct {
-	gorm.Model
-	Name      string     `gorm:"unique;not null"`
-	Users     []User     `gorm:"many2many:user_make_routine;"`
-	Exercises []Exercise `gorm:"many2many:routine_work_exercise;"`
+	ID          uint           `gorm:"primaryKey" json:"id"`
+	CreatedAt   time.Time      `json:"createdAt"`
+	UpdatedAt   time.Time      `json:"updatedAt"`
+	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deletedAt,omitempty"`
+	Name        string         `gorm:"unique;not_null" json:"name"`
+	Description string         `json:"description"`
+	Users       []User         `gorm:"many2many:user_make_routine;" json:"users"`
+	Exercises   []Exercise     `gorm:"many2many:routine_work_exercise;" json:"exercises"`
 }
