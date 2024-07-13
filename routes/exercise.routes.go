@@ -66,6 +66,10 @@ func CreateUserExerciseHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Devolver el ejercicio creado
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(exercise)
 }
 
 // Actualizar un ejercicio

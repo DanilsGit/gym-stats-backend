@@ -14,6 +14,7 @@ type Routine struct {
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"deletedAt,omitempty"`
 	Name        string         `gorm:"unique;not_null" json:"name"`
 	Description string         `json:"description"`
+	Public      bool           `gorm:"default:true" json:"public"`
 	Users       []User         `gorm:"many2many:user_make_routine;" json:"users"`
 	Exercises   []Exercise     `gorm:"many2many:routine_work_exercise;" json:"exercises"`
 }

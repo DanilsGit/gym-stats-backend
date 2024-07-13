@@ -4,6 +4,7 @@ package models
 type RoutineRequest struct {
 	Name            string            `json:"name"`
 	Description     string            `json:"description"`
+	Public          bool              `json:"public"`
 	ExerciseRequest []ExerciseRequest `json:"exercises"`
 }
 
@@ -11,4 +12,10 @@ type RoutineRequest struct {
 type UpdateNameRoutineRequest struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
+}
+
+// Estructura para cambiar la descripción de la rutina
+type UpdateDescriptionRoutineRequest struct {
+	ID          uint   `json:"id"`
+	Description string `json:"description"`
 }

@@ -24,22 +24,29 @@ func main() {
 	r.HandleFunc("/", routes.HomeHandler)
 
 	// Usuario y autenticación
-	r.HandleFunc("/users", routes.GetUsersHandler).Methods("GET")
-	r.HandleFunc("/users/{id}", routes.GetUserHandler).Methods("GET")
 	r.HandleFunc("/users", routes.PostUserHandler).Methods("POST")
-	r.HandleFunc("/users/{id}", routes.DeleteUserHandler).Methods("DELETE")
 	r.HandleFunc("/login", routes.LoginHandler).Methods("POST")
 	r.HandleFunc("/login/social", routes.LoginSocialHandler).Methods("POST")
+	// Rutinas generales
+	r.HandleFunc("/routines", routes.GetRoutinesHandler).Methods("GET")
+	r.Handle("/routines/copy", routes.JwtAuthentication(http.HandlerFunc(routes.CopyRoutineHandler))).Methods("POST")
+	r.HandleFunc("/routines/{id}", routes.GetRoutineHandler).Methods("GET")
 	// Rutinas del usuario
-	r.Handle("/users/{id}/routines", routes.JwtAuthentication(http.HandlerFunc(routes.GetUserRoutinesHandler))).Methods("GET")
+	// Sin autenticación
+	r.HandleFunc("/users/routines/{userId}", routes.GetRoutineByUserIdHandler).Methods("GET")
+	// Con autenticación
+	r.Handle("/users/routines", routes.JwtAuthentication(http.HandlerFunc(routes.GetUserRoutinesHandler))).Methods("GET")
 	r.Handle("/users/routines", routes.JwtAuthentication(http.HandlerFunc(routes.CreateUserRoutineHandler))).Methods("POST")
 	r.Handle("/users/routines/name", routes.JwtAuthentication(http.HandlerFunc(routes.UpdateNameUserRoutineHandler))).Methods("PUT")
+	r.Handle("/users/routines/description", routes.JwtAuthentication(http.HandlerFunc(routes.UpdateDescriptionUserRoutineHandler))).Methods("PUT")
 	r.Handle("/users/routines/{id}", routes.JwtAuthentication(http.HandlerFunc(routes.DeleteUserRoutineHandler))).Methods("DELETE")
 	// Ejercicios del usuario
 	r.Handle("/users/routines/exercises/name", routes.JwtAuthentication(http.HandlerFunc(routes.UpdateNameUserExerciseHandler))).Methods("PUT")
 	r.Handle("/users/routines/exercises", routes.JwtAuthentication(http.HandlerFunc(routes.CreateUserExerciseHandler))).Methods("POST")
 	r.Handle("/users/routines/exercises/{id}", routes.JwtAuthentication(http.HandlerFunc(routes.DeleteUserExerciseHandler))).Methods("DELETE")
 	r.Handle("/users/routines/exercises/sets", routes.JwtAuthentication(http.HandlerFunc(routes.UpdateUserExerciseHandler))).Methods("PUT")
+	// Configuración del usuario
+	r.Handle("/users/config/username", routes.JwtAuthentication(http.HandlerFunc(routes.PutUserInUsernameHandler))).Methods("PUT")
 
 	corsOpts := handlers.CORS(
 		handlers.AllowedOrigins([]string{"http://localhost:5173", "https://gymstats.netlify.app"}),
