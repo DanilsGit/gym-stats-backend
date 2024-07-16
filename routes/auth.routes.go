@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -13,20 +12,15 @@ import (
 	"github.com/danilsgit/gym-stats-backend/db"
 	"github.com/danilsgit/gym-stats-backend/models"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
+var jwtKey []byte
+
 func init() {
-	// Carga las variables de entorno desde el archivo .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// jwtKey se inicializa con el valor de JWT_KEY desde las variables de entorno
 	jwtKey = []byte(os.Getenv("JWT_KEY"))
 }
-
-var jwtKey []byte // Actualizado para ser inicializado en init()
 
 func GenerateJWT(userID string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
