@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/danilsgit/gym-stats-backend/db"
 	"github.com/danilsgit/gym-stats-backend/models"
@@ -55,5 +57,9 @@ func main() {
 		handlers.AllowCredentials(),
 	)
 
-	http.ListenAndServe(":8080", corsOpts(r))
+	PORT := os.Getenv("PORT")
+
+	log.Println("Server running on port", PORT)
+
+	http.ListenAndServe(":"+PORT, corsOpts(r))
 }
