@@ -51,7 +51,7 @@ func main() {
 	r.Handle("/users/config/username", routes.JwtAuthentication(http.HandlerFunc(routes.PutUserInUsernameHandler))).Methods("PUT")
 
 	corsOpts := handlers.CORS(
-		handlers.AllowedOrigins([]string{"http://localhost:5173", "https://gymstats.netlify.app"}),
+		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
 		handlers.AllowCredentials(),
